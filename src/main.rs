@@ -18,9 +18,35 @@ struct Velocity {
     x_vel: f64,
     y_vel: f64,
 }
+impl Velocity {
+    fn accelerate(&mut self, direction: i64) {
+        if self.x_vel < 500. {
+            self.x_vel = self.x_vel + 1.0;
+        }
+        println!("velocity: {:}", self.x_vel)
+    }
+}
 
 #[derive(Component)]
-struct Direction(i64);
+struct Direction {
+    angle: f64,
+}
+impl Direction {
+    fn rotate_right(&mut self) {
+        self.angle += 1.;
+        if self.angle >= 360. {
+            self.angle -= 360.
+        }
+        println!("rotated to : {:}", self.angle)
+    }
+    fn rotate_left(&mut self) {
+        self.angle -= 1.;
+        if self.angle < 0. {
+            self.angle += 360.
+        }
+        println!("rotated to : {:}", self.angle)
+    }
+}
 
 #[derive(Bundle)]
 struct ShipBundle {
@@ -35,7 +61,7 @@ fn spawn_player(mut commands: Commands) {
         health: Health(10),
         position: ShipPosition { x: 10., y: 10. },
         velocity: Velocity { x_vel: 0.0, y_vel: 0.0 },
-        direction: Direction(0),
+        direction: Direction { angle: 0. },
     };
     commands
         .spawn_bundle(SpriteBundle {
@@ -44,7 +70,7 @@ fn spawn_player(mut commands: Commands) {
                 ..Default::default()
             },
             transform: Transform {
-                scale: Vec3::new(10.0, 10.0, 10.0),
+                scale: Vec3::new(20.0, 10.0, 10.0),
                 ..Default::default()
             },
             ..Default::default()
@@ -55,32 +81,22 @@ fn spawn_player(mut commands: Commands) {
         .insert(player.direction);
 }
 
-fn accelerate(mut query: Query<&mut Velocity>,
-) {
-    for mut velocity in query.iter_mut() {
-        if velocity.x_vel < 500. {
-            velocity.x_vel = velocity.x_vel + 1.0;
-        }
-        println!("velocity: {:}", velocity.x_vel);
-    }
-}
-
 fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
-    mut ship_control: Query<&mut Transform, With<ShipPosition>>,
+    mut query: Query<(&mut Velocity, &mut Direction)>
 ) {
-    for mut transform in ship_control.iter_mut() {
+    for (mut velocity, mut direction) in query.iter_mut() {
         if keyboard_input.pressed(KeyCode::Left) {
-            transform.translation.x -= 2.;
+            direction.rotate_left();
         }
         if keyboard_input.pressed(KeyCode::Right) {
-            transform.translation.x += 2.;
+            direction.rotate_right();
         }
         if keyboard_input.pressed(KeyCode::Down) {
-            transform.translation.y -= 2.;
+            velocity.accelerate(5);
         }
         if keyboard_input.pressed(KeyCode::Up) {
-            transform.translation.y += 2.;
+            velocity.accelerate(5);
         }
     }
 }
@@ -92,12 +108,11 @@ fn setup_camera(mut commands: Commands) {
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.2)))
-        .add_plugin(LogDiagnosticsPlugin::default())
-        .add_plugin(FrameTimeDiagnosticsPlugin::default())
+        //.add_plugin(LogDiagnosticsPlugin::default())
+        //.add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_startup_system(setup_camera)
         .add_startup_system(spawn_player)
         .add_system(player_movement)
-        .add_system(accelerate)
         .add_plugins(DefaultPlugins)
         .run();
 }
