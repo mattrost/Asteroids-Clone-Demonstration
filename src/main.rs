@@ -5,6 +5,7 @@ use bevy::input::mouse::MouseScrollUnit::Pixel;
 use rand::random;
 
 const SHIP_COLOR: Color = Color::rgb(1.0, 1.0, 1.0);
+const MAX_SPEED: f64 = 100.;
 
 #[derive(Component)]
 struct Health(u64);
@@ -28,26 +29,18 @@ impl Velocity {
     }
     fn accelerate(&mut self, direction: f64) {
         let current_vel_direction: f64 = (self.y_vel/self.x_vel).atan();
-        println!("propulsion direction: {:}", xy_direction);
+        println!("propulsion direction: {:}", current_vel_direction);
 
-        if self.xy_velocity() < 500. {
-            self.x_vel = self.x_vel + direction.cos();
-            self.y_vel = self.y_vel + direction.sin();
+        self.x_vel = self.x_vel + direction.cos();
+        self.y_vel = self.y_vel + direction.sin();
+        let squares: f64 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
+
+        if squares > MAX_SPEED*MAX_SPEED {
+            let current_speed: f64 = squares.sqrt();
+            self.x_vel *= (MAX_SPEED / current_speed);
+            self.y_vel *= (MAX_SPEED / current_speed);
         }
-            /*
-        else {
-            let next_x_vel = self.x_vel + direction.cos();
-            let next_y_vel = self.y_vel + direction.sin();
 
-            let new_x_vel = self.x_vel + direction.cos();
-            self.y_vel = self.y_vel + direction.sin();
-            let squares: f64 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
-            let next_xy_vel: f64 = squares.sqrt();
-
-            xy_vel
-            // Need to implement top speed
-        }
-        */
         println!("velocity: {:} {:}", self.x_vel, self.y_vel);
         self.print_speed()
     }
