@@ -52,13 +52,13 @@ struct Direction {
 }
 impl Direction {
     fn rotate_right(&mut self) {
-        self.angle += 0.01;
+        self.angle -= 0.01;
         if self.angle >= 2.*PI {
             self.angle -= 2.*PI
         }
     }
     fn rotate_left(&mut self) {
-        self.angle -= 0.01;
+        self.angle += 0.01;
         if self.angle < 0. {
             self.angle += 2.*PI
         }
