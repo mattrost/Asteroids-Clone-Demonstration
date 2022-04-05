@@ -1,5 +1,7 @@
+use std::f64::consts::PI;
 use bevy::prelude::*;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+use bevy::input::mouse::MouseScrollUnit::Pixel;
 use rand::random;
 
 const SHIP_COLOR: Color = Color::rgb(1.0, 1.0, 1.0);
@@ -44,16 +46,16 @@ struct Direction {
 }
 impl Direction {
     fn rotate_right(&mut self) {
-        self.angle += 1.;
-        if self.angle >= 360. {
-            self.angle -= 360.
+        self.angle += 0.01;
+        if self.angle >= PI {
+            self.angle -= PI
         }
         println!("rotated to : {:}", self.angle)
     }
     fn rotate_left(&mut self) {
-        self.angle -= 1.;
+        self.angle -= 0.01;
         if self.angle < 0. {
-            self.angle += 360.
+            self.angle += PI
         }
         println!("rotated to : {:}", self.angle)
     }
