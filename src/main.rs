@@ -87,7 +87,7 @@ fn spawn_player(mut commands: Commands) {
                 ..Default::default()
             },
             transform: Transform {
-                scale: Vec3::new(5.0, 15.0, 10.0),
+                scale: Vec3::new(10.0, 30.0, 10.0),
                 ..Default::default()
             },
             ..Default::default()
@@ -116,6 +116,7 @@ fn player_movement(
             velocity.accelerate(direction.angle);
         }
 
+        transform.rotate(Quat::from_rotation_z(direction.angle));
         transform.translation.x += SPEED_FACTOR*velocity.x_vel;
         transform.translation.y += SPEED_FACTOR*velocity.y_vel;
     }
