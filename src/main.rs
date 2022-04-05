@@ -26,11 +26,29 @@ impl Velocity {
         let xy_vel: f64 = squares.sqrt();
         xy_vel
     }
-    fn accelerate(&mut self, direction: i64) {
-        if self.x_vel < 500. {
-            self.x_vel = self.x_vel + 1.0;
+    fn accelerate(&mut self, direction: f64) {
+        let current_vel_direction: f64 = (self.y_vel/self.x_vel).atan();
+        println!("propulsion direction: {:}", xy_direction);
+
+        if self.xy_velocity() < 500. {
+            self.x_vel = self.x_vel + direction.cos();
+            self.y_vel = self.y_vel + direction.sin();
         }
-        println!("velocity: {:}", self.x_vel);
+            /*
+        else {
+            let next_x_vel = self.x_vel + direction.cos();
+            let next_y_vel = self.y_vel + direction.sin();
+
+            let new_x_vel = self.x_vel + direction.cos();
+            self.y_vel = self.y_vel + direction.sin();
+            let squares: f64 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
+            let next_xy_vel: f64 = squares.sqrt();
+
+            xy_vel
+            // Need to implement top speed
+        }
+        */
+        println!("velocity: {:} {:}", self.x_vel, self.y_vel);
         self.print_speed()
     }
     fn print_speed(&self) {
@@ -47,15 +65,15 @@ struct Direction {
 impl Direction {
     fn rotate_right(&mut self) {
         self.angle += 0.01;
-        if self.angle >= PI {
-            self.angle -= PI
+        if self.angle >= 2.*PI {
+            self.angle -= 2.*PI
         }
         println!("rotated to : {:}", self.angle)
     }
     fn rotate_left(&mut self) {
         self.angle -= 0.01;
         if self.angle < 0. {
-            self.angle += PI
+            self.angle += 2.*PI
         }
         println!("rotated to : {:}", self.angle)
     }
@@ -74,7 +92,7 @@ fn spawn_player(mut commands: Commands) {
         health: Health(10),
         position: ShipPosition { x: 10., y: 10. },
         velocity: Velocity { x_vel: 0.0, y_vel: 0.0 },
-        direction: Direction { angle: 0. },
+        direction: Direction { angle: PI/2. },
     };
     commands
         .spawn_bundle(SpriteBundle {
@@ -106,10 +124,10 @@ fn player_movement(
             direction.rotate_right();
         }
         if keyboard_input.pressed(KeyCode::Down) {
-            velocity.accelerate(5);
+            velocity.accelerate(direction.angle);
         }
         if keyboard_input.pressed(KeyCode::Up) {
-            velocity.accelerate(5);
+            velocity.accelerate(direction.angle);
         }
     }
 }
