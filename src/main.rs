@@ -55,14 +55,12 @@ impl Direction {
         if self.angle >= 2.*PI {
             self.angle -= 2.*PI
         }
-        println!("rotated to : {:}", self.angle)
     }
     fn rotate_left(&mut self) {
         self.angle -= 0.01;
         if self.angle < 0. {
             self.angle += 2.*PI
         }
-        println!("rotated to : {:}", self.angle)
     }
 }
 
@@ -116,6 +114,8 @@ fn player_movement(
         if keyboard_input.pressed(KeyCode::Up) {
             velocity.accelerate(direction.angle);
         }
+    }
+    for (velocity) in query.iter() {
     }
 }
 
