@@ -28,9 +28,6 @@ impl Velocity {
         xy_vel
     }
     fn accelerate(&mut self, direction: f64) {
-        let current_vel_direction: f64 = (self.y_vel/self.x_vel).atan();
-        println!("propulsion direction: {:}", current_vel_direction);
-
         self.x_vel = self.x_vel + direction.cos();
         self.y_vel = self.y_vel + direction.sin();
         let squares: f64 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
@@ -40,9 +37,6 @@ impl Velocity {
             self.x_vel *= (MAX_SPEED / current_speed);
             self.y_vel *= (MAX_SPEED / current_speed);
         }
-
-        println!("velocity: {:} {:}", self.x_vel, self.y_vel);
-        self.print_speed()
     }
     fn print_speed(&self) {
         let squares: f64 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
