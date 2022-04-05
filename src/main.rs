@@ -21,8 +21,8 @@ struct Velocity {
 impl Velocity {
     fn xy_velocity(&self) -> f64 {
         let squares: f64 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
-        let max_speed: f64 = squares.sqrt();
-        max_speed
+        let xy_vel: f64 = squares.sqrt();
+        xy_vel
     }
     fn accelerate(&mut self, direction: i64) {
         if self.x_vel < 500. {
