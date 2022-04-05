@@ -1,53 +1,54 @@
-use std::f64::consts::PI;
+use std::f32::consts::PI;
 use bevy::prelude::*;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::input::mouse::MouseScrollUnit::Pixel;
 use rand::random;
 
 const SHIP_COLOR: Color = Color::rgb(1.0, 1.0, 1.0);
-const MAX_SPEED: f64 = 100.;
+const MAX_SPEED: f32 = 100.;
+const SPEED_FACTOR: f32 = 0.1;
 
 #[derive(Component)]
 struct Health(u64);
 
 #[derive(Component)]
 struct ShipPosition {
-    x: f64,
-    y: f64,
+    x: f32,
+    y: f32,
 }
 
 #[derive(Component)]
 struct Velocity {
-    x_vel: f64,
-    y_vel: f64,
+    x_vel: f32,
+    y_vel: f32,
 }
 impl Velocity {
-    fn xy_velocity(&self) -> f64 {
-        let squares: f64 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
-        let xy_vel: f64 = squares.sqrt();
+    fn xy_velocity(&self) -> f32 {
+        let squares: f32 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
+        let xy_vel: f32 = squares.sqrt();
         xy_vel
     }
-    fn accelerate(&mut self, direction: f64) {
+    fn accelerate(&mut self, direction: f32) {
         self.x_vel = self.x_vel + direction.cos();
         self.y_vel = self.y_vel + direction.sin();
-        let squares: f64 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
+        let squares: f32 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
 
         if squares > MAX_SPEED*MAX_SPEED {
-            let current_speed: f64 = squares.sqrt();
+            let current_speed: f32 = squares.sqrt();
             self.x_vel *= (MAX_SPEED / current_speed);
             self.y_vel *= (MAX_SPEED / current_speed);
         }
     }
     fn print_speed(&self) {
-        let squares: f64 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
-        let max_speed: f64 = squares.sqrt();
+        let squares: f32 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
+        let max_speed: f32 = squares.sqrt();
         println!("max speed = {}", max_speed);
     }
 }
 
 #[derive(Component)]
 struct Direction {
-    angle: f64,
+    angle: f32,
 }
 impl Direction {
     fn rotate_right(&mut self) {
@@ -86,7 +87,7 @@ fn spawn_player(mut commands: Commands) {
                 ..Default::default()
             },
             transform: Transform {
-                scale: Vec3::new(20.0, 10.0, 10.0),
+                scale: Vec3::new(5.0, 15.0, 10.0),
                 ..Default::default()
             },
             ..Default::default()
@@ -99,9 +100,9 @@ fn spawn_player(mut commands: Commands) {
 
 fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Velocity, &mut Direction)>
+    mut query: Query<(&mut Transform, &mut Velocity, &mut Direction)>
 ) {
-    for (mut velocity, mut direction) in query.iter_mut() {
+    for (mut transform, mut velocity, mut direction) in query.iter_mut() {
         if keyboard_input.pressed(KeyCode::Left) {
             direction.rotate_left();
         }
@@ -114,8 +115,9 @@ fn player_movement(
         if keyboard_input.pressed(KeyCode::Up) {
             velocity.accelerate(direction.angle);
         }
-    }
-    for (velocity) in query.iter() {
+
+        transform.translation.x += SPEED_FACTOR*velocity.x_vel;
+        transform.translation.y += SPEED_FACTOR*velocity.y_vel;
     }
 }
 
