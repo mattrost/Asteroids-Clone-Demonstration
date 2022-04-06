@@ -4,9 +4,10 @@ use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::input::mouse::MouseScrollUnit::Pixel;
 use rand::random;
 
-const SHIP_COLOR: Color = Color::rgb(1.0, 1.0, 1.0);
+const SHIP_COLOR: Color = Color::rgb(1.0, 1.0, 0.0);
 const MAX_SPEED: f32 = 100.;
-const SPEED_FACTOR: f32 = 0.1;
+const SPEED_FACTOR: f32 = 0.05;
+const TURN_FACTOR: f32 = 3.5;
 
 #[derive(Component)]
 struct Health(u64);
@@ -52,13 +53,13 @@ struct Direction {
 }
 impl Direction {
     fn rotate_right(&mut self) {
-        self.angle -= 0.01;
+        self.angle -= TURN_FACTOR*0.01;
         if self.angle >= 2.*PI {
             self.angle -= 2.*PI
         }
     }
     fn rotate_left(&mut self) {
-        self.angle += 0.01;
+        self.angle += TURN_FACTOR*0.01;
         if self.angle < 0. {
             self.angle += 2.*PI
         }
@@ -87,7 +88,7 @@ fn spawn_player(mut commands: Commands) {
                 ..Default::default()
             },
             transform: Transform {
-                scale: Vec3::new(10.0, 30.0, 10.0),
+                scale: Vec3::new(30.0, 30.0, 10.0),
                 ..Default::default()
             },
             ..Default::default()
@@ -104,19 +105,26 @@ fn player_movement(
 ) {
     for (mut transform, mut velocity, mut direction) in query.iter_mut() {
         if keyboard_input.pressed(KeyCode::Left) {
+            let prev_dir = direction.angle;
             direction.rotate_left();
+            let dir_change = direction.angle - prev_dir;
+            transform.rotate(Quat::from_rotation_z(dir_change));
         }
         if keyboard_input.pressed(KeyCode::Right) {
+            let prev_dir = direction.angle;
             direction.rotate_right();
+            let dir_change = direction.angle - prev_dir;
+            transform.rotate(Quat::from_rotation_z(dir_change));
         }
         if keyboard_input.pressed(KeyCode::Down) {
             velocity.accelerate(direction.angle);
+            // Need to make this rotate towards the opposite of velocity vector
         }
         if keyboard_input.pressed(KeyCode::Up) {
             velocity.accelerate(direction.angle);
         }
 
-        transform.rotate(Quat::from_rotation_z(direction.angle));
+        // transform.rotate(Quat::from_rotation_z(direction.angle));
         transform.translation.x += SPEED_FACTOR*velocity.x_vel;
         transform.translation.y += SPEED_FACTOR*velocity.y_vel;
     }
