@@ -67,7 +67,7 @@ impl Direction {
 }
 
 #[derive(Bundle)]
-struct ShipBundle {
+struct PlayerShipBundle {
     health: Health,
     position: ShipPosition,
     velocity: Velocity,
@@ -75,7 +75,7 @@ struct ShipBundle {
 }
 
 fn spawn_player(mut commands: Commands) {
-    let player = ShipBundle {
+    let player = PlayerShipBundle {
         health: Health(10),
         position: ShipPosition { x: 10., y: 10. },
         velocity: Velocity { x_vel: 0.0, y_vel: 0.0 },
@@ -117,14 +117,20 @@ fn player_movement(
             transform.rotate(Quat::from_rotation_z(dir_change));
         }
         if keyboard_input.pressed(KeyCode::Down) {
-            velocity.accelerate(direction.angle);
-            // Need to make this rotate towards the opposite of velocity vector
+            let dir_velocity: f32 = (velocity.y_vel/velocity.x_vel).atan();
+            let difference: f32 = direction.angle - dir_velocity;
+            println!("Difference {}", difference);
+            if difference < PI {
+                let prev_dir = direction.angle;
+                direction.rotate_right();
+                let dir_change = direction.angle - prev_dir;
+                transform.rotate(Quat::from_rotation_z(dir_change));
+            }
         }
         if keyboard_input.pressed(KeyCode::Up) {
             velocity.accelerate(direction.angle);
         }
 
-        // transform.rotate(Quat::from_rotation_z(direction.angle));
         transform.translation.x += SPEED_FACTOR*velocity.x_vel;
         transform.translation.y += SPEED_FACTOR*velocity.y_vel;
     }
