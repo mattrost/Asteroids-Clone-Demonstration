@@ -146,10 +146,10 @@ fn edge_warp(mut query: Query<(&mut Transform, &mut Position)>) {
     let edge_buffer: f32 = 15.;
     for (mut transform, mut position) in query.iter_mut() {
         println!("Position: x = {}  y = {}", position.x, position.y);
-        if position.x > (WINDOW_X/2. + edge_buffer) {
+        if position.x > (WINDOW_X/2. - edge_buffer) {
             transform.translation.x -= WINDOW_X;
             position.x -= WINDOW_X
-        } else if position.x < -(WINDOW_X/2. - edge_buffer) {
+        } else if position.x < -(WINDOW_X/2. + edge_buffer) {
             transform.translation.x += WINDOW_X;
             position.x += WINDOW_X
         }
