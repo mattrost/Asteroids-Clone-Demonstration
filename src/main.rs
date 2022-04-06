@@ -155,9 +155,9 @@ fn spawn_asteroid(mut commands: Commands) {
 
 fn player_input(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, &mut Position, & Human)>
+    mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, & Human)>
 ) {
-    for (mut transform, mut velocity, mut direction, mut position, human) in query.iter_mut() {
+    for (mut transform, mut velocity, mut direction, human) in query.iter_mut() {
         if human.is_human {
             if keyboard_input.pressed(KeyCode::Left) {
                 let prev_dir = direction.angle;
