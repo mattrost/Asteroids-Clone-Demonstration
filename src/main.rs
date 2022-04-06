@@ -1,19 +1,23 @@
 use std::f32::consts::PI;
 use bevy::prelude::*;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-use bevy::input::mouse::MouseScrollUnit::Pixel;
-use rand::random;
+use bevy::ecs::event::Events;
+use bevy::window::WindowResized;
+
+const WINDOW_X: f32 = 1280.;
+const WINDOW_Y: f32 = 720.;
 
 const SHIP_COLOR: Color = Color::rgb(1.0, 1.0, 0.0);
 const MAX_SPEED: f32 = 100.;
 const SPEED_FACTOR: f32 = 0.05;
 const TURN_FACTOR: f32 = 3.5;
 
+
 #[derive(Component)]
 struct Health(u64);
 
 #[derive(Component)]
-struct ShipPosition {
+struct Position {
     x: f32,
     y: f32,
 }
@@ -36,8 +40,8 @@ impl Velocity {
 
         if squares > MAX_SPEED*MAX_SPEED {
             let current_speed: f32 = squares.sqrt();
-            self.x_vel *= (MAX_SPEED / current_speed);
-            self.y_vel *= (MAX_SPEED / current_speed);
+            self.x_vel *= MAX_SPEED / current_speed;
+            self.y_vel *= MAX_SPEED / current_speed;
         }
     }
     fn print_speed(&self) {
@@ -69,7 +73,7 @@ impl Direction {
 #[derive(Bundle)]
 struct PlayerShipBundle {
     health: Health,
-    position: ShipPosition,
+    position: Position,
     velocity: Velocity,
     direction: Direction,
 }
@@ -77,7 +81,7 @@ struct PlayerShipBundle {
 fn spawn_player(mut commands: Commands) {
     let player = PlayerShipBundle {
         health: Health(10),
-        position: ShipPosition { x: 10., y: 10. },
+        position: Position { x: 0., y: 0. },
         velocity: Velocity { x_vel: 0.0, y_vel: 0.0 },
         direction: Direction { angle: PI/2. },
     };
@@ -101,9 +105,9 @@ fn spawn_player(mut commands: Commands) {
 
 fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Transform, &mut Velocity, &mut Direction)>
+    mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, &mut Position)>
 ) {
-    for (mut transform, mut velocity, mut direction) in query.iter_mut() {
+    for (mut transform, mut velocity, mut direction, mut position) in query.iter_mut() {
         if keyboard_input.pressed(KeyCode::Left) {
             let prev_dir = direction.angle;
             direction.rotate_left();
@@ -133,6 +137,37 @@ fn player_movement(
 
         transform.translation.x += SPEED_FACTOR*velocity.x_vel;
         transform.translation.y += SPEED_FACTOR*velocity.y_vel;
+        position.x += SPEED_FACTOR*velocity.x_vel;
+        position.y += SPEED_FACTOR*velocity.y_vel;
+    }
+}
+
+fn edge_warp(mut query: Query<(&mut Transform, &mut Position)>) {
+    let edge_buffer: f32 = 15.;
+    for (mut transform, mut position) in query.iter_mut() {
+        println!("Position: x = {}  y = {}", position.x, position.y);
+        if position.x > (WINDOW_X/2. + edge_buffer) {
+            transform.translation.x -= WINDOW_X;
+            position.x -= WINDOW_X
+        } else if position.x < -(WINDOW_X/2. - edge_buffer) {
+            transform.translation.x += WINDOW_X;
+            position.x += WINDOW_X
+        }
+
+        if position.y > (WINDOW_Y/2. - edge_buffer) {
+            transform.translation.y -= WINDOW_Y;
+            position.y -= WINDOW_Y;
+        } else if position.y < (-WINDOW_Y/2. + edge_buffer) {
+            transform.translation.y += WINDOW_Y;
+            position.y += WINDOW_Y;
+        }
+    }
+}
+
+fn resize_notificator(resize_event: Res<Events<WindowResized>>) {
+    let mut reader = resize_event.get_reader();
+    for e in reader.iter(&resize_event) {
+        println!("width = {} height = {}", e.width, e.height);
     }
 }
 
@@ -147,7 +182,9 @@ fn main() {
         //.add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_startup_system(setup_camera)
         .add_startup_system(spawn_player)
+        .add_system(resize_notificator)
         .add_system(player_movement)
+        .add_system(edge_warp)
         .add_plugins(DefaultPlugins)
         .run();
 }
