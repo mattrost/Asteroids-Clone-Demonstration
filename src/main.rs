@@ -1,13 +1,14 @@
 use std::f32::consts::PI;
 use bevy::prelude::*;
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-use bevy::ecs::event::Events;
-use bevy::window::WindowResized;
+//use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+//use bevy::ecs::event::Events;
+//use bevy::window::WindowResized;
 
 const WINDOW_X: f32 = 1280.;
 const WINDOW_Y: f32 = 720.;
 
 const SHIP_COLOR: Color = Color::rgb(1.0, 1.0, 0.0);
+const ASTEROID_COLOR: Color = Color::rgb(0.0, 1.0, 1.0);
 const MAX_SPEED: f32 = 100.;
 const SPEED_FACTOR: f32 = 0.05;
 const TURN_FACTOR: f32 = 3.5;
@@ -28,11 +29,6 @@ struct Velocity {
     y_vel: f32,
 }
 impl Velocity {
-    fn xy_velocity(&self) -> f32 {
-        let squares: f32 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
-        let xy_vel: f32 = squares.sqrt();
-        xy_vel
-    }
     fn accelerate(&mut self, direction: f32) {
         self.x_vel = self.x_vel + direction.cos();
         self.y_vel = self.y_vel + direction.sin();
@@ -43,11 +39,6 @@ impl Velocity {
             self.x_vel *= MAX_SPEED / current_speed;
             self.y_vel *= MAX_SPEED / current_speed;
         }
-    }
-    fn print_speed(&self) {
-        let squares: f32 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
-        let max_speed: f32 = squares.sqrt();
-        println!("max speed = {}", max_speed);
     }
 }
 
@@ -84,6 +75,14 @@ struct PlayerShipBundle {
     human: Human
 }
 
+#[derive(Bundle)]
+struct AsteroidBundle {
+    health: Health,
+    position: Position,
+    velocity: Velocity,
+}
+
+
 fn spawn_player(mut commands: Commands) {
     let player = PlayerShipBundle {
         health: Health(10),
@@ -111,7 +110,35 @@ fn spawn_player(mut commands: Commands) {
         .insert(player.human);
 }
 
-fn player_movement(
+fn spawn_asteroid(mut commands: Commands) {
+    let rand_pos_x: f32 = 0.;
+    let rand_pos_y: f32 = 0.;
+    let rand_vel_x: f32 = 0.;
+    let rand_vel_y: f32 = 0.;
+
+    let asteroid = AsteroidBundle {
+        health: Health(10),
+        position: Position { x: 0., y: 0. },
+        velocity: Velocity { x_vel: 30., y_vel: 90. },
+    };
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                color: ASTEROID_COLOR,
+                ..Default::default()
+            },
+            transform: Transform {
+                scale: Vec3::new(30.0, 30.0, 10.0),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .insert(asteroid.health)
+        .insert(asteroid.position)
+        .insert(asteroid.velocity);
+}
+
+fn player_input(
     keyboard_input: Res<Input<KeyCode>>,
     mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, &mut Position, & Human)>
 ) {
@@ -144,7 +171,13 @@ fn player_movement(
                 velocity.accelerate(direction.angle);
             }
         }
+    }
+}
 
+fn movement(
+    mut query: Query<(&mut Transform, &mut Velocity, &mut Position)>
+) {
+    for (mut transform, mut velocity, mut position) in query.iter_mut() {
         transform.translation.x += SPEED_FACTOR*velocity.x_vel;
         transform.translation.y += SPEED_FACTOR*velocity.y_vel;
         position.x += SPEED_FACTOR*velocity.x_vel;
@@ -174,12 +207,14 @@ fn edge_warp(mut query: Query<(&mut Transform, &mut Position)>) {
     }
 }
 
+/*
 fn resize_notificator(resize_event: Res<Events<WindowResized>>) {
     let mut reader = resize_event.get_reader();
     for e in reader.iter(&resize_event) {
         println!("width = {} height = {}", e.width, e.height);
     }
 }
+*/
 
 fn setup_camera(mut commands: Commands) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
@@ -192,8 +227,10 @@ fn main() {
         //.add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_startup_system(setup_camera)
         .add_startup_system(spawn_player)
+        .add_startup_system(spawn_asteroid)
         //.add_system(resize_notificator)
-        .add_system(player_movement)
+        .add_system(player_input)
+        .add_system(movement)
         .add_system(edge_warp)
         .add_plugins(DefaultPlugins)
         .run();
