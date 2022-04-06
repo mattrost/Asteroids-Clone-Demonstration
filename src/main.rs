@@ -70,12 +70,18 @@ impl Direction {
     }
 }
 
+#[derive(Component)]
+struct Human {
+    is_human: bool,
+}
+
 #[derive(Bundle)]
 struct PlayerShipBundle {
     health: Health,
     position: Position,
     velocity: Velocity,
     direction: Direction,
+    human: Human
 }
 
 fn spawn_player(mut commands: Commands) {
@@ -84,6 +90,7 @@ fn spawn_player(mut commands: Commands) {
         position: Position { x: 0., y: 0. },
         velocity: Velocity { x_vel: 0.0, y_vel: 0.0 },
         direction: Direction { angle: PI/2. },
+        human: Human {is_human: true},
     };
     commands
         .spawn_bundle(SpriteBundle {
@@ -100,39 +107,42 @@ fn spawn_player(mut commands: Commands) {
         .insert(player.health)
         .insert(player.position)
         .insert(player.velocity)
-        .insert(player.direction);
+        .insert(player.direction)
+        .insert(player.human);
 }
 
 fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, &mut Position)>
+    mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, &mut Position, & Human)>
 ) {
-    for (mut transform, mut velocity, mut direction, mut position) in query.iter_mut() {
-        if keyboard_input.pressed(KeyCode::Left) {
-            let prev_dir = direction.angle;
-            direction.rotate_left();
-            let dir_change = direction.angle - prev_dir;
-            transform.rotate(Quat::from_rotation_z(dir_change));
-        }
-        if keyboard_input.pressed(KeyCode::Right) {
-            let prev_dir = direction.angle;
-            direction.rotate_right();
-            let dir_change = direction.angle - prev_dir;
-            transform.rotate(Quat::from_rotation_z(dir_change));
-        }
-        if keyboard_input.pressed(KeyCode::Down) {
-            let dir_velocity: f32 = (velocity.y_vel/velocity.x_vel).atan();
-            let difference: f32 = direction.angle - dir_velocity;
-            println!("Difference {}", difference);
-            if difference < PI {
+    for (mut transform, mut velocity, mut direction, mut position, human) in query.iter_mut() {
+        if human.is_human {
+            if keyboard_input.pressed(KeyCode::Left) {
+                let prev_dir = direction.angle;
+                direction.rotate_left();
+                let dir_change = direction.angle - prev_dir;
+                transform.rotate(Quat::from_rotation_z(dir_change));
+            }
+            if keyboard_input.pressed(KeyCode::Right) {
                 let prev_dir = direction.angle;
                 direction.rotate_right();
                 let dir_change = direction.angle - prev_dir;
                 transform.rotate(Quat::from_rotation_z(dir_change));
             }
-        }
-        if keyboard_input.pressed(KeyCode::Up) {
-            velocity.accelerate(direction.angle);
+            if keyboard_input.pressed(KeyCode::Down) {
+                let dir_velocity: f32 = (velocity.y_vel/velocity.x_vel).atan();
+                let difference: f32 = direction.angle - dir_velocity;
+                println!("Difference {}", difference);
+                if difference < PI {
+                    let prev_dir = direction.angle;
+                    direction.rotate_right();
+                    let dir_change = direction.angle - prev_dir;
+                    transform.rotate(Quat::from_rotation_z(dir_change));
+                }
+            }
+            if keyboard_input.pressed(KeyCode::Up) {
+                velocity.accelerate(direction.angle);
+            }
         }
 
         transform.translation.x += SPEED_FACTOR*velocity.x_vel;
@@ -144,8 +154,8 @@ fn player_movement(
 
 fn edge_warp(mut query: Query<(&mut Transform, &mut Position)>) {
     let edge_buffer: f32 = 15.;
+
     for (mut transform, mut position) in query.iter_mut() {
-        println!("Position: x = {}  y = {}", position.x, position.y);
         if position.x > (WINDOW_X/2. - edge_buffer) {
             transform.translation.x -= WINDOW_X;
             position.x -= WINDOW_X
@@ -182,7 +192,7 @@ fn main() {
         //.add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_startup_system(setup_camera)
         .add_startup_system(spawn_player)
-        .add_system(resize_notificator)
+        //.add_system(resize_notificator)
         .add_system(player_movement)
         .add_system(edge_warp)
         .add_plugins(DefaultPlugins)
