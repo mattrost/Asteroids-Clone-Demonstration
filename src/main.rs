@@ -1,5 +1,6 @@
 use std::f32::consts::PI;
 use bevy::prelude::*;
+use rand::prelude::*;
 //use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 //use bevy::ecs::event::Events;
 //use bevy::window::WindowResized;
@@ -111,15 +112,28 @@ fn spawn_player(mut commands: Commands) {
 }
 
 fn spawn_asteroid(mut commands: Commands) {
-    let rand_pos_x: f32 = 0.;
-    let rand_pos_y: f32 = 0.;
-    let rand_vel_x: f32 = 0.;
-    let rand_vel_y: f32 = 0.;
+    let rand_angle: f32 = rand::random::<f32>()*2.*PI;
+    let rand_vel: f32 = rand::random::<f32>()*MAX_SPEED;
+
+
+    let mut rand_pos_x: f32 = rand::random::<f32>()*WINDOW_X;
+    let mut rand_pos_y: f32 = rand::random::<f32>()*WINDOW_Y;
+
+    if rand_pos_x > WINDOW_X/2. {
+        rand_pos_x -= WINDOW_X;
+    }
+
+    if rand_pos_y > WINDOW_Y/2. {
+        rand_pos_y -= WINDOW_Y;
+    }
+
+    let rand_vel_x: f32 = rand_vel*rand_angle.cos();
+    let rand_vel_y: f32 = rand_vel*rand_angle.sin();
 
     let asteroid = AsteroidBundle {
         health: Health(10),
-        position: Position { x: 0., y: 0. },
-        velocity: Velocity { x_vel: 30., y_vel: 90. },
+        position: Position { x: rand_pos_x, y: rand_pos_y },
+        velocity: Velocity { x_vel: rand_vel_x, y_vel: rand_vel_y },
     };
     commands
         .spawn_bundle(SpriteBundle {
@@ -129,6 +143,7 @@ fn spawn_asteroid(mut commands: Commands) {
             },
             transform: Transform {
                 scale: Vec3::new(30.0, 30.0, 10.0),
+                translation: Vec3::new(rand_pos_x, rand_pos_y, 10.0),
                 ..Default::default()
             },
             ..Default::default()
