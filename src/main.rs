@@ -44,6 +44,12 @@ impl Velocity {
 }
 
 #[derive(Component)]
+struct Projectile {
+    distance_traveled: f32,
+    damage: u64,
+}
+
+#[derive(Component)]
 struct Direction {
     angle: f32,
 }
@@ -151,6 +157,14 @@ fn spawn_asteroid(mut commands: Commands) {
         .insert(asteroid.health)
         .insert(asteroid.position)
         .insert(asteroid.velocity);
+}
+
+fn spawn_laser(
+    origin_x: f32,
+    origin_y: f32,
+    angle: f32,
+) {
+
 }
 
 fn player_input(
