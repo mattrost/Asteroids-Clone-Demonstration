@@ -11,8 +11,8 @@ const WINDOW_Y: f32 = 720.;
 const SHIP_COLOR: Color = Color::rgb(1.0, 1.0, 0.0);
 const ASTEROID_COLOR: Color = Color::rgb(0.0, 1.0, 1.0);
 const MAX_SPEED: f32 = 100.;
-const SPEED_FACTOR: f32 = 0.05;
-const TURN_FACTOR: f32 = 3.5;
+const MAX_ACCEL: f32 = 0.05;
+const TURN_FACTOR: f32 = 3.0;
 
 
 #[derive(Component)]
@@ -207,10 +207,10 @@ fn movement(
     mut query: Query<(&mut Transform, &mut Velocity, &mut Position)>
 ) {
     for (mut transform, mut velocity, mut position) in query.iter_mut() {
-        transform.translation.x += SPEED_FACTOR*velocity.x_vel;
-        transform.translation.y += SPEED_FACTOR*velocity.y_vel;
-        position.x += SPEED_FACTOR*velocity.x_vel;
-        position.y += SPEED_FACTOR*velocity.y_vel;
+        transform.translation.x += MAX_ACCEL*velocity.x_vel;
+        transform.translation.y += MAX_ACCEL*velocity.y_vel;
+        position.x += MAX_ACCEL*velocity.x_vel;
+        position.y += MAX_ACCEL*velocity.y_vel;
     }
 }
 
