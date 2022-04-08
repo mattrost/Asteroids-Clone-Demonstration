@@ -11,6 +11,7 @@ const WINDOW_Y: f32 = 720.;
 const SHIP_COLOR: Color = Color::rgb(1.0, 1.0, 0.0);
 const ASTEROID_COLOR: Color = Color::rgb(0.0, 1.0, 1.0);
 const MAX_SPEED: f32 = 100.;
+const BULLET_SPEED: f32 = 100.;
 const MAX_ACCEL: f32 = 0.05;
 const TURN_FACTOR: f32 = 3.0;
 
@@ -22,6 +23,11 @@ struct Health(u64);
 struct Position {
     x: f32,
     y: f32,
+}
+
+#[derive(Component)]
+struct Damage {
+    damage: u64,
 }
 
 #[derive(Component)]
@@ -46,7 +52,7 @@ impl Velocity {
 #[derive(Component)]
 struct Projectile {
     distance_traveled: f32,
-    damage: u64,
+    timing: f32,
 }
 
 #[derive(Component)]
@@ -87,6 +93,14 @@ struct AsteroidBundle {
     health: Health,
     position: Position,
     velocity: Velocity,
+}
+
+#[derive(Bundle)]
+struct LaserBundle {
+    projectile: Projectile,
+    direction: Direction,
+    health: Health,
+    damage: Damage,
 }
 
 
@@ -163,6 +177,7 @@ fn spawn_laser(
     origin_x: f32,
     origin_y: f32,
     angle: f32,
+    mut commands: Commands,
 ) {
 
 }
