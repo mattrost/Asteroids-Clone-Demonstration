@@ -187,33 +187,31 @@ fn player_input(
     mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, & Human)>
 ) {
     for (mut transform, mut velocity, mut direction, human) in query.iter_mut() {
-        if human.is_human {
-            if keyboard_input.pressed(KeyCode::Left) {
-                let prev_dir = direction.angle;
-                direction.rotate_left();
-                let dir_change = direction.angle - prev_dir;
-                transform.rotate(Quat::from_rotation_z(dir_change));
-            }
-            if keyboard_input.pressed(KeyCode::Right) {
+        if keyboard_input.pressed(KeyCode::Left) {
+            let prev_dir = direction.angle;
+            direction.rotate_left();
+            let dir_change = direction.angle - prev_dir;
+            transform.rotate(Quat::from_rotation_z(dir_change));
+        }
+        if keyboard_input.pressed(KeyCode::Right) {
+            let prev_dir = direction.angle;
+            direction.rotate_right();
+            let dir_change = direction.angle - prev_dir;
+            transform.rotate(Quat::from_rotation_z(dir_change));
+        }
+        if keyboard_input.pressed(KeyCode::Down) {
+            let dir_velocity: f32 = (velocity.y_vel/velocity.x_vel).atan();
+            let difference: f32 = direction.angle - dir_velocity;
+            println!("Difference {}", difference);
+            if difference < PI {
                 let prev_dir = direction.angle;
                 direction.rotate_right();
                 let dir_change = direction.angle - prev_dir;
                 transform.rotate(Quat::from_rotation_z(dir_change));
             }
-            if keyboard_input.pressed(KeyCode::Down) {
-                let dir_velocity: f32 = (velocity.y_vel/velocity.x_vel).atan();
-                let difference: f32 = direction.angle - dir_velocity;
-                println!("Difference {}", difference);
-                if difference < PI {
-                    let prev_dir = direction.angle;
-                    direction.rotate_right();
-                    let dir_change = direction.angle - prev_dir;
-                    transform.rotate(Quat::from_rotation_z(dir_change));
-                }
-            }
-            if keyboard_input.pressed(KeyCode::Up) {
-                velocity.accelerate(direction.angle);
-            }
+        }
+        if keyboard_input.pressed(KeyCode::Up) {
+            velocity.accelerate(direction.angle);
         }
     }
 }
