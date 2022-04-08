@@ -186,7 +186,7 @@ fn player_input(
     keyboard_input: Res<Input<KeyCode>>,
     mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, & Human)>
 ) {
-    for (mut transform, mut velocity, mut direction, human) in query.iter_mut() {
+    for (mut transform, mut velocity, mut direction, _human) in query.iter_mut() {
         if keyboard_input.pressed(KeyCode::Left) {
             let prev_dir = direction.angle;
             direction.rotate_left();
@@ -219,7 +219,7 @@ fn player_input(
 fn movement(
     mut query: Query<(&mut Transform, &mut Velocity, &mut Position)>
 ) {
-    for (mut transform, mut velocity, mut position) in query.iter_mut() {
+    for (mut transform, velocity, mut position) in query.iter_mut() {
         transform.translation.x += MAX_ACCEL*velocity.x_vel;
         transform.translation.y += MAX_ACCEL*velocity.y_vel;
         position.x += MAX_ACCEL*velocity.x_vel;
