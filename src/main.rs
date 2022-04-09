@@ -10,6 +10,8 @@ const WINDOW_Y: f32 = 720.;
 
 const SHIP_COLOR: Color = Color::rgb(1.0, 1.0, 0.0);
 const ASTEROID_COLOR: Color = Color::rgb(0.0, 1.0, 1.0);
+const LASER_COLOR: Color = Color::rgb(1.0, 0.0, 0.0);
+
 const MAX_SPEED: f32 = 100.;
 const BULLET_SPEED: f32 = 100.;
 const MAX_ACCEL: f32 = 0.05;
@@ -97,12 +99,12 @@ struct AsteroidBundle {
 
 #[derive(Bundle)]
 struct LaserBundle {
-    projectile: Projectile,
-    direction: Direction,
     health: Health,
+    position: Position,
+    velocity: Velocity,
+    projectile: Projectile,
     damage: Damage,
 }
-
 
 fn spawn_player(mut commands: Commands) {
     let player = PlayerShipBundle {
@@ -134,7 +136,6 @@ fn spawn_player(mut commands: Commands) {
 fn spawn_asteroid(mut commands: Commands) {
     let rand_angle: f32 = rand::random::<f32>()*2.*PI;
     let rand_vel: f32 = rand::random::<f32>()*MAX_SPEED;
-
 
     let mut rand_pos_x: f32 = rand::random::<f32>()*WINDOW_X;
     let mut rand_pos_y: f32 = rand::random::<f32>()*WINDOW_Y;
@@ -174,19 +175,55 @@ fn spawn_asteroid(mut commands: Commands) {
 }
 
 fn spawn_laser(
-    origin_x: f32,
-    origin_y: f32,
-    angle: f32,
+    keyboard_input: Res<Input<KeyCode>>,
+    query: Query<(& Velocity, & Direction, & Position, & Human)>,
     mut commands: Commands,
-) {
-
+) { for (velocity, direction, position, _human) in query.iter() {
+        if keyboard_input.pressed(KeyCode::Space) {
+            let laser = LaserBundle {
+                health: Health(1),
+                position: Position {
+                    x: position.x,
+                    y: position.y,
+                },
+                velocity: Velocity {
+                    x_vel: BULLET_SPEED*direction.angle.cos() + velocity.x_vel,
+                    y_vel: BULLET_SPEED*direction.angle.sin() + velocity.y_vel,
+                },
+                projectile: Projectile {
+                    distance_traveled: 0.,
+                    timing: 2.,
+                },
+                damage: Damage {
+                    damage: 5,
+                },
+            };
+            commands
+                .spawn_bundle(SpriteBundle {
+                    sprite: Sprite {
+                        color: LASER_COLOR,
+                        ..Default::default()
+                    },
+                    transform: Transform {
+                        scale: Vec3::new(5.0, 5.0, 10.0),
+                        translation: Vec3::new(position.x, position.y, 10.0),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                })
+                .insert(laser.health)
+                .insert(laser.position)
+                .insert(laser.velocity)
+                .insert(laser.projectile)
+                .insert(laser.damage);
+        }
+    }
 }
-
 fn player_input(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, & Human)>
+    mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, & Position, & Human)>
 ) {
-    for (mut transform, mut velocity, mut direction, _human) in query.iter_mut() {
+    for (mut transform, mut velocity, mut direction, _position, _human) in query.iter_mut() {
         if keyboard_input.pressed(KeyCode::Left) {
             let prev_dir = direction.angle;
             direction.rotate_left();
@@ -262,11 +299,16 @@ fn setup_camera(mut commands: Commands) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 }
 
+
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.2)))
+
+        .add_plugins(DefaultPlugins)
         //.add_plugin(LogDiagnosticsPlugin::default())
         //.add_plugin(FrameTimeDiagnosticsPlugin::default())
+
+
         .add_startup_system(setup_camera)
         .add_startup_system(spawn_player)
         .add_startup_system(spawn_asteroid)
@@ -274,6 +316,6 @@ fn main() {
         .add_system(player_input)
         .add_system(movement)
         .add_system(edge_warp)
-        .add_plugins(DefaultPlugins)
+        .add_system(spawn_laser)
         .run();
 }
