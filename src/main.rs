@@ -1,9 +1,18 @@
 use std::f32::consts::PI;
 use bevy::prelude::*;
 use rand::prelude::*;
-//use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-//use bevy::ecs::event::Events;
+use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+use bevy::ecs::event::Events;
 //use bevy::window::WindowResized;
+
+/*
+Future Ideas:
+
+Have neverending level with hi score. Spawn random letters on asteroids.
+Player must consecutively shoot asteroids to spell an English word. Word
+is scored with difficulty of letters, scrabble style. Maybe a few random
+powerups. On hit, player loses and present high score.
+ */
 
 const WINDOW_X: f32 = 1280.;
 const WINDOW_Y: f32 = 720.;
@@ -54,7 +63,7 @@ impl Velocity {
 #[derive(Component)]
 struct Projectile {
     distance_traveled: f32,
-    timing: f32,
+    timer: Timer,
 }
 
 #[derive(Component)]
@@ -177,6 +186,7 @@ fn spawn_asteroid(mut commands: Commands) {
 fn spawn_laser(
     keyboard_input: Res<Input<KeyCode>>,
     query: Query<(& Velocity, & Direction, & Position, & Human)>,
+    time: Res<Time>,
     mut commands: Commands,
 ) { for (velocity, direction, position, _human) in query.iter() {
         if keyboard_input.pressed(KeyCode::Space) {
@@ -192,7 +202,7 @@ fn spawn_laser(
                 },
                 projectile: Projectile {
                     distance_traveled: 0.,
-                    timing: 2.,
+                    timer: Timer::from_seconds(2., false),
                 },
                 damage: Damage {
                     damage: 5,
@@ -219,6 +229,21 @@ fn spawn_laser(
         }
     }
 }
+
+fn despawn_laser(
+    mut commands: Commands,
+    // mut collision_event: EventWriter<CollisionEvent>,
+    lasers: Query<(Entity, & Projectile)>,
+) {
+    for (laser, projectile) in lasers.iter() {
+        println!("{}", projectile.timer.percent());
+        println!("yeeee" )
+        // if time has elapsed {
+        //     commands.entity(laser).despawn();
+        // }
+    }
+}
+
 fn player_input(
     keyboard_input: Res<Input<KeyCode>>,
     mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, & Position, & Human)>
@@ -305,8 +330,8 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.2)))
 
         .add_plugins(DefaultPlugins)
-        //.add_plugin(LogDiagnosticsPlugin::default())
-        //.add_plugin(FrameTimeDiagnosticsPlugin::default())
+        .add_plugin(LogDiagnosticsPlugin::default())
+        .add_plugin(FrameTimeDiagnosticsPlugin::default())
 
 
         .add_startup_system(setup_camera)
@@ -317,5 +342,6 @@ fn main() {
         .add_system(movement)
         .add_system(edge_warp)
         .add_system(spawn_laser)
+        .add_system(despawn_laser)
         .run();
 }
