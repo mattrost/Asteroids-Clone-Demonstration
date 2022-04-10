@@ -297,7 +297,7 @@ fn edge_warp(mut query: Query<(&mut Transform, &mut Position)>) {
         if position.x > (WINDOW_X/2. - edge_buffer) {
             transform.translation.x -= WINDOW_X;
             position.x -= WINDOW_X
-        } else if position.x < -(WINDOW_X/2. + edge_buffer) {
+        } else if position.x < (-WINDOW_X/2. + edge_buffer) {
             transform.translation.x += WINDOW_X;
             position.x += WINDOW_X
         }
@@ -333,7 +333,6 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(LogDiagnosticsPlugin::default())
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
-
 
         .add_startup_system(setup_camera)
         .add_startup_system(spawn_player)
