@@ -61,9 +61,9 @@ impl Velocity {
 }
 
 #[derive(Component)]
-struct Projectile {
-    distance_traveled: f32,
+struct ProjectileTimer {
     timer: Timer,
+    elapsed: bool,
 }
 
 #[derive(Component)]
@@ -111,7 +111,7 @@ struct LaserBundle {
     health: Health,
     position: Position,
     velocity: Velocity,
-    projectile: Projectile,
+    projectile: ProjectileTimer,
     damage: Damage,
 }
 
@@ -200,9 +200,9 @@ fn spawn_laser(
                     x_vel: BULLET_SPEED*direction.angle.cos() + velocity.x_vel,
                     y_vel: BULLET_SPEED*direction.angle.sin() + velocity.y_vel,
                 },
-                projectile: Projectile {
-                    distance_traveled: 0.,
-                    timer: Timer::from_seconds(2., false),
+                projectile: ProjectileTimer {
+                    timer: Timer::from_seconds(0.5, true),
+                    elapsed: false,
                 },
                 damage: Damage {
                     damage: 5,
@@ -232,15 +232,16 @@ fn spawn_laser(
 
 fn despawn_laser(
     mut commands: Commands,
-    // mut collision_event: EventWriter<CollisionEvent>,
-    lasers: Query<(Entity, & Projectile)>,
+    time: Res<Time>,
+    mut query: Query<(Entity, &mut ProjectileTimer)>,
 ) {
-    for (laser, projectile) in lasers.iter() {
-        println!("{}", projectile.timer.percent());
-        println!("yeeee" )
-        // if time has elapsed {
-        //     commands.entity(laser).despawn();
-        // }
+    for (entity, mut projectile) in query.iter_mut() {
+        if projectile.timer.tick(time.delta()).just_finished() {
+             projectile.elapsed = true;
+        }
+        if projectile.elapsed == true {
+            commands.entity(entity).despawn();
+        }
     }
 }
 
