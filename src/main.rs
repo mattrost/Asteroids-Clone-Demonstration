@@ -1,8 +1,8 @@
-use std::f32::consts::PI;
-use bevy::prelude::*;
-use rand::prelude::*;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::ecs::event::Events;
+use bevy::prelude::*;
+use rand::prelude::*;
+use std::f32::consts::PI;
 //use bevy::window::WindowResized;
 
 /*
@@ -25,7 +25,6 @@ const MAX_SPEED: f32 = 100.;
 const BULLET_SPEED: f32 = 100.;
 const MAX_ACCEL: f32 = 0.05;
 const TURN_FACTOR: f32 = 3.0;
-
 
 #[derive(Component)]
 struct Health(u64);
@@ -50,9 +49,9 @@ impl Velocity {
     fn accelerate(&mut self, direction: f32) {
         self.x_vel = self.x_vel + direction.cos();
         self.y_vel = self.y_vel + direction.sin();
-        let squares: f32 = self.x_vel*self.x_vel + self.y_vel*self.y_vel;
+        let squares: f32 = self.x_vel * self.x_vel + self.y_vel * self.y_vel;
 
-        if squares > MAX_SPEED*MAX_SPEED {
+        if squares > MAX_SPEED * MAX_SPEED {
             let current_speed: f32 = squares.sqrt();
             self.x_vel *= MAX_SPEED / current_speed;
             self.y_vel *= MAX_SPEED / current_speed;
@@ -72,15 +71,15 @@ struct Direction {
 }
 impl Direction {
     fn rotate_right(&mut self) {
-        self.angle -= TURN_FACTOR*0.01;
-        if self.angle >= 2.*PI {
-            self.angle -= 2.*PI
+        self.angle -= TURN_FACTOR * 0.01;
+        if self.angle >= 2. * PI {
+            self.angle -= 2. * PI
         }
     }
     fn rotate_left(&mut self) {
-        self.angle += TURN_FACTOR*0.01;
+        self.angle += TURN_FACTOR * 0.01;
         if self.angle < 0. {
-            self.angle += 2.*PI
+            self.angle += 2. * PI
         }
     }
 }
@@ -96,7 +95,7 @@ struct PlayerShipBundle {
     position: Position,
     velocity: Velocity,
     direction: Direction,
-    human: Human
+    human: Human,
 }
 
 #[derive(Bundle)]
@@ -119,9 +118,12 @@ fn spawn_player(mut commands: Commands) {
     let player = PlayerShipBundle {
         health: Health(10),
         position: Position { x: 0., y: 0. },
-        velocity: Velocity { x_vel: 0.0, y_vel: 0.0 },
-        direction: Direction { angle: PI/2. },
-        human: Human {is_human: true},
+        velocity: Velocity {
+            x_vel: 0.0,
+            y_vel: 0.0,
+        },
+        direction: Direction { angle: PI / 2. },
+        human: Human { is_human: true },
     };
     commands
         .spawn_bundle(SpriteBundle {
@@ -143,27 +145,33 @@ fn spawn_player(mut commands: Commands) {
 }
 
 fn spawn_asteroid(mut commands: Commands) {
-    let rand_angle: f32 = rand::random::<f32>()*2.*PI;
-    let rand_vel: f32 = rand::random::<f32>()*MAX_SPEED;
+    let rand_angle: f32 = rand::random::<f32>() * 2. * PI;
+    let rand_vel: f32 = rand::random::<f32>() * MAX_SPEED;
 
-    let mut rand_pos_x: f32 = rand::random::<f32>()*WINDOW_X;
-    let mut rand_pos_y: f32 = rand::random::<f32>()*WINDOW_Y;
+    let mut rand_pos_x: f32 = rand::random::<f32>() * WINDOW_X;
+    let mut rand_pos_y: f32 = rand::random::<f32>() * WINDOW_Y;
 
-    if rand_pos_x > WINDOW_X/2. {
+    if rand_pos_x > WINDOW_X / 2. {
         rand_pos_x -= WINDOW_X;
     }
 
-    if rand_pos_y > WINDOW_Y/2. {
+    if rand_pos_y > WINDOW_Y / 2. {
         rand_pos_y -= WINDOW_Y;
     }
 
-    let rand_vel_x: f32 = rand_vel*rand_angle.cos();
-    let rand_vel_y: f32 = rand_vel*rand_angle.sin();
+    let rand_vel_x: f32 = rand_vel * rand_angle.cos();
+    let rand_vel_y: f32 = rand_vel * rand_angle.sin();
 
     let asteroid = AsteroidBundle {
         health: Health(10),
-        position: Position { x: rand_pos_x, y: rand_pos_y },
-        velocity: Velocity { x_vel: rand_vel_x, y_vel: rand_vel_y },
+        position: Position {
+            x: rand_pos_x,
+            y: rand_pos_y,
+        },
+        velocity: Velocity {
+            x_vel: rand_vel_x,
+            y_vel: rand_vel_y,
+        },
     };
     commands
         .spawn_bundle(SpriteBundle {
@@ -185,10 +193,11 @@ fn spawn_asteroid(mut commands: Commands) {
 
 fn spawn_laser(
     keyboard_input: Res<Input<KeyCode>>,
-    query: Query<(& Velocity, & Direction, & Position, & Human)>,
+    query: Query<(&Velocity, &Direction, &Position, &Human)>,
     time: Res<Time>,
     mut commands: Commands,
-) { for (velocity, direction, position, _human) in query.iter() {
+) {
+    for (velocity, direction, position, _human) in query.iter() {
         if keyboard_input.pressed(KeyCode::Space) {
             let laser = LaserBundle {
                 health: Health(1),
@@ -197,16 +206,14 @@ fn spawn_laser(
                     y: position.y,
                 },
                 velocity: Velocity {
-                    x_vel: BULLET_SPEED*direction.angle.cos() + velocity.x_vel,
-                    y_vel: BULLET_SPEED*direction.angle.sin() + velocity.y_vel,
+                    x_vel: BULLET_SPEED * direction.angle.cos() + velocity.x_vel,
+                    y_vel: BULLET_SPEED * direction.angle.sin() + velocity.y_vel,
                 },
                 projectile: ProjectileTimer {
                     timer: Timer::from_seconds(0.5, true),
                     elapsed: false,
                 },
-                damage: Damage {
-                    damage: 5,
-                },
+                damage: Damage { damage: 5 },
             };
             commands
                 .spawn_bundle(SpriteBundle {
@@ -237,7 +244,7 @@ fn despawn_laser(
 ) {
     for (entity, mut projectile) in query.iter_mut() {
         if projectile.timer.tick(time.delta()).just_finished() {
-             projectile.elapsed = true;
+            projectile.elapsed = true;
         }
         if projectile.elapsed == true {
             commands.entity(entity).despawn();
@@ -247,7 +254,13 @@ fn despawn_laser(
 
 fn player_input(
     keyboard_input: Res<Input<KeyCode>>,
-    mut query: Query<(&mut Transform, &mut Velocity, &mut Direction, & Position, & Human)>
+    mut query: Query<(
+        &mut Transform,
+        &mut Velocity,
+        &mut Direction,
+        &Position,
+        &Human,
+    )>,
 ) {
     for (mut transform, mut velocity, mut direction, _position, _human) in query.iter_mut() {
         if keyboard_input.pressed(KeyCode::Left) {
@@ -263,7 +276,7 @@ fn player_input(
             transform.rotate(Quat::from_rotation_z(dir_change));
         }
         if keyboard_input.pressed(KeyCode::Down) {
-            let dir_velocity: f32 = (velocity.y_vel/velocity.x_vel).atan();
+            let dir_velocity: f32 = (velocity.y_vel / velocity.x_vel).atan();
             let difference: f32 = direction.angle - dir_velocity;
             println!("Difference {}", difference);
             if difference < PI {
@@ -279,14 +292,12 @@ fn player_input(
     }
 }
 
-fn movement(
-    mut query: Query<(&mut Transform, &mut Velocity, &mut Position)>
-) {
+fn movement(mut query: Query<(&mut Transform, &mut Velocity, &mut Position)>) {
     for (mut transform, velocity, mut position) in query.iter_mut() {
-        transform.translation.x += MAX_ACCEL*velocity.x_vel;
-        transform.translation.y += MAX_ACCEL*velocity.y_vel;
-        position.x += MAX_ACCEL*velocity.x_vel;
-        position.y += MAX_ACCEL*velocity.y_vel;
+        transform.translation.x += MAX_ACCEL * velocity.x_vel;
+        transform.translation.y += MAX_ACCEL * velocity.y_vel;
+        position.x += MAX_ACCEL * velocity.x_vel;
+        position.y += MAX_ACCEL * velocity.y_vel;
     }
 }
 
@@ -294,18 +305,18 @@ fn edge_warp(mut query: Query<(&mut Transform, &mut Position)>) {
     let edge_buffer: f32 = 15.;
 
     for (mut transform, mut position) in query.iter_mut() {
-        if position.x > (WINDOW_X/2. - edge_buffer) {
+        if position.x > (WINDOW_X / 2. - edge_buffer) {
             transform.translation.x -= WINDOW_X;
             position.x -= WINDOW_X
-        } else if position.x < (-WINDOW_X/2. + edge_buffer) {
+        } else if position.x < (-WINDOW_X / 2. + edge_buffer) {
             transform.translation.x += WINDOW_X;
             position.x += WINDOW_X
         }
 
-        if position.y > (WINDOW_Y/2. - edge_buffer) {
+        if position.y > (WINDOW_Y / 2. - edge_buffer) {
             transform.translation.y -= WINDOW_Y;
             position.y -= WINDOW_Y;
-        } else if position.y < (-WINDOW_Y/2. + edge_buffer) {
+        } else if position.y < (-WINDOW_Y / 2. + edge_buffer) {
             transform.translation.y += WINDOW_Y;
             position.y += WINDOW_Y;
         }
@@ -325,15 +336,12 @@ fn setup_camera(mut commands: Commands) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 }
 
-
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.2)))
-
         .add_plugins(DefaultPlugins)
         .add_plugin(LogDiagnosticsPlugin::default())
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
-
         .add_startup_system(setup_camera)
         .add_startup_system(spawn_player)
         .add_startup_system(spawn_asteroid)
