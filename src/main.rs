@@ -1,9 +1,9 @@
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::ecs::event::Events;
 use bevy::prelude::*;
+use bevy::sprite::collide_aabb::collide;
 use rand::prelude::*;
 use std::f32::consts::PI;
-use bevy::sprite::collide_aabb::collide;
 //use bevy::window::WindowResized;
 
 /*
@@ -28,8 +28,8 @@ const MAX_ACCEL: f32 = 0.05;
 const TURN_FACTOR: f32 = 3.0;
 
 #[derive(Component)]
-struct Health{
-    hp: u64
+struct Health {
+    hp: u64,
 }
 
 #[derive(Component)]
@@ -118,12 +118,8 @@ struct LaserBundle {
 
 fn spawn_player(mut commands: Commands) {
     let player = PlayerShipBundle {
-        health: Health {
-            hp: 10,
-        },
-        position: Position {
-            x: 0.,
-            y: 0. },
+        health: Health { hp: 10 },
+        position: Position { x: 0., y: 0. },
         velocity: Velocity {
             x_vel: 0.0,
             y_vel: 0.0,
@@ -169,9 +165,7 @@ fn spawn_asteroid(mut commands: Commands) {
     let rand_vel_y: f32 = rand_vel * rand_angle.sin();
 
     let asteroid = AsteroidBundle {
-        health: Health {
-            hp: 10
-        },
+        health: Health { hp: 200 },
         position: Position {
             x: rand_pos_x,
             y: rand_pos_y,
@@ -260,12 +254,11 @@ fn despawn_laser(
 
 fn detect_laser_collision(
     mut commands: Commands,
-    laser_query: Query<(& Damage, & Transform)>,
-    mut query: Query<(Entity, & Transform, &mut Health)>
+    laser_query: Query<(Entity, &Damage, &Transform)>,
+    mut query: Query<(Entity, &Transform, &mut Health)>,
 ) {
-
     for (entity, transform, mut health) in query.iter_mut() {
-        for (damage, laser_transform) in laser_query.iter() {
+        for (laser_entity, damage, laser_transform) in laser_query.iter() {
             let laser_size = laser_transform.scale.truncate();
 
             let collision = collide(
@@ -280,6 +273,7 @@ fn detect_laser_collision(
                 if health.hp <= 0 {
                     commands.entity(entity).despawn();
                 }
+                commands.entity(laser_entity).despawn();
             }
         }
     }
