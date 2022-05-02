@@ -39,11 +39,6 @@ struct Position {
 }
 
 #[derive(Component)]
-struct Damage {
-    damage: u64,
-}
-
-#[derive(Component)]
 struct Velocity {
     x_vel: f32,
     y_vel: f32,
@@ -60,12 +55,6 @@ impl Velocity {
             self.y_vel *= MAX_SPEED / current_speed;
         }
     }
-}
-
-#[derive(Component)]
-struct ProjectileTimer {
-    timer: Timer,
-    elapsed: bool,
 }
 
 #[derive(Component)]
@@ -86,6 +75,19 @@ impl Direction {
         }
     }
 }
+
+#[derive(Component)]
+struct Damage {
+    damage: u64,
+}
+
+
+#[derive(Component)]
+struct ProjectileTimer {
+    timer: Timer,
+    elapsed: bool,
+}
+
 
 #[derive(Component)]
 struct Human {
@@ -319,7 +321,7 @@ fn player_input(
     }
 }
 
-fn movement(mut query: Query<(&mut Transform, &mut Velocity, &mut Position)>) {
+fn movement(mut query: Query<(&mut Transform, & Velocity, &mut Position)>) {
     for (mut transform, velocity, mut position) in query.iter_mut() {
         transform.translation.x += MAX_ACCEL * velocity.x_vel;
         transform.translation.y += MAX_ACCEL * velocity.y_vel;

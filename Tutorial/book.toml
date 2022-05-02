@@ -1,0 +1,6 @@
+[book]
+authors = ["mattrost"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Bevy Tutorial - 2D Space Combat"

@@ -1,0 +1,761 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Bevy Tutorial - 2D Space Combat</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Introduction</a></li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Project Initialization</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> Components</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> Bundles</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">4.</strong> Startup Systems</a></li><li class="chapter-item expanded "><a href="chapter_5.html"><strong aria-hidden="true">5.</strong> Runtime Systems</a></li><li class="chapter-item expanded "><a href="chapter_6.html"><strong aria-hidden="true">6.</strong> Next Steps</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Bevy Tutorial - 2D Space Combat</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p>Hello! This is a tutorial on how to make a simple 2D space combat game with
+the Bevy game engine. This is the first program I have made with Bevy, so if
+you have any questions, concerns, or suggestions please submit an issue on
+<a href="https://github.com/mattrost/meteors">GitHub</a>
+or feel free to send me an email at
+<a href="mailto:rostma@oregonstate.edu">rostma@oregonstate.edu</a>.</p>
+<p>This tutorial assumes that the user has already installed rust on their
+computer. If that is not the case, please refer to the
+<a href="https://www.rust-lang.org/tools/install">&quot;Getting Started&quot;</a>
+section of rust-lang.org. This tutorial also assumes that users have some
+programming fundamental skills and some understanding of how Rust and
+Cargo work. Users do not need to feel proficient with Rust, especially since
+I am also currently learning Rust! This tutorial was created after following
+the
+<a href="https://bevyengine.org/learn/book/introduction/">Bevy Book Example</a>
+and
+<a href="https://mbuffett.com/posts/bevy-snake-tutorial/">M Buffett's Bevy Snake Clone</a>.</p>
+<p>This tutorial uses player created physics. If you are interested in pre-existing
+physics for Bevy, feel free to take a look at <a href="https://crates.io/crates/rapier2d">Rapier</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="project-initialization"><a class="header" href="#project-initialization">Project Initialization</a></h1>
+<h2 id="creating-a-bevy-app"><a class="header" href="#creating-a-bevy-app">Creating a Bevy App</a></h2>
+<p>First we must create an empty Rust program. To do this, we will start by
+running <code>cargo new game</code>. Cargo will then create a new rust app with <code>main.rs</code>
+and <code>Cargo.toml</code> in its directory.</p>
+<h2 id="modifying-app-dependencies"><a class="header" href="#modifying-app-dependencies">Modifying App Dependencies</a></h2>
+<p>We then will open up <code>Cargo.toml</code> in a text editor or IDE and add Bevy to the
+dependencies section. This tutorial was created with Bevy version 0.6.1.
+Note: The <code>Cargo.toml</code> file is used to contain information about the Project
+including its name, version, authors, and also contains information about
+crate dependencies. Crates can be found at <a href="https://crates.io">crates.io</a>
+and function as packages for Rust programs. The dependencies are downloaded,
+if necessary, when the app is compiled and run by using <code>cargo run</code>. We also
+will add the <code>rand</code> crate which will be used later into the project when we
+randomize the spawning of asteroids.</p>
+<pre><code class="language-toml">[dependencies]
+bevy = &quot;0.6.1&quot;
+rand = &quot;0.8.5&quot;
+</code></pre>
+<h2 id="using-a-dependency-in-mainrs"><a class="header" href="#using-a-dependency-in-mainrs">Using a Dependency in main.rs</a></h2>
+<p>The next step is to update our <code>main.rs</code> file to use Bevy and initialize an
+app. The example we are using below is a simple example that is shown in the
+<a href="https://bevyengine.org/learn/book/getting-started/apps/">Bevy Book Example</a>.</p>
+<pre><code class="language-rust  noplayground">use bevy::prelude::*;
+
+fn main() {
+    App::new().run();
+}
+</code></pre>
+<p>Make sure to now run <code>cargo run</code> in your directory. Nothing should happen yet,
+but we are now set up to begin building our game!</p>
+<p>Next we will begin working with Bevy's Entity-Component-System. An entity
+is a single thing with its own identity. A component is the data that makes
+up entities. A system is a behavior, implemented as a function.</p>
+<p>To build the structure for our app we will begin by focusing on the Components.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="components"><a class="header" href="#components">Components</a></h1>
+<h2 id="what-is-a-component"><a class="header" href="#what-is-a-component">What is a Component</a></h2>
+<p>According to <a href="http://t-machine.org/index.php/2007/11/11/entity-systems-are-the-future-of-mmog-development-part-2/">Adam Martin</a>, a component is the raw data for one aspect
+of an object, and how it interacts with the world. An entity is made up of
+this raw data and can be made of multiple components. A few examples he listed
+for a Bicycle component are the following:</p>
+<ul>
+<li>Material</li>
+<li>Usable by humans</li>
+<li>Means of transportation</li>
+<li>Can be bought and sold</li>
+<li>A potential present</li>
+<li>Man-made</li>
+</ul>
+<h2 id="our-first-component---health"><a class="header" href="#our-first-component---health">Our First Component - Health</a></h2>
+<p>We are going to start a little bit simpler with our first component.
+Each player and each flying asteroid will have their own health. When the
+health reaches zero, that entity will die. To make a component for this we
+will use an integer to represent the health value. A component is created by
+first putting <code>#[derive(Component)]</code> on a line and beneath it creating a
+struct that is the component.</p>
+<pre><code class="language-rust  noplayground">#[derive(Component)]
+struct Health {
+    hp: u64,
+}
+</code></pre>
+<p>Each health component will have an hp attribute that stores the amount of
+hit points that an entity has.</p>
+<h2 id="position"><a class="header" href="#position">Position</a></h2>
+<p>A commonly used comopnent for entities is the position. This will be represented
+by the x and y axis positions. In Bevy, the origin (x=0, y=0) is located at
+the center of the window.</p>
+<pre><code class="language-rust  noplayground">#[derive(Component)]
+struct Position {
+    x: f32,
+    y: f32,
+}
+</code></pre>
+<h2 id="velocity"><a class="header" href="#velocity">Velocity</a></h2>
+<p>Entities that are moving in space have a velocity. This component is used to
+store the velocity of the entity. We also are introducing an implementation here
+to our Velocity struct. This implementation is used to accelerate the velocity.
+This will be used when a player presses the accelerate button on their keyboard.</p>
+<p>We also are introducing a constant here, <code>MAX_SPEED</code>. This is a global
+constant that is used to set the maximum velocity for any entity.</p>
+<pre><code class="language-rust  noplayground">const MAX_SPEED: f32 = 100.;
+
+#[derive(Component)]
+struct Velocity {
+    x_vel: f32,
+    y_vel: f32,
+}
+impl Velocity {
+    fn accelerate(&amp;mut self, direction: f32) {
+        self.x_vel = self.x_vel + direction.cos();
+        self.y_vel = self.y_vel + direction.sin();
+        let squares: f32 = self.x_vel * self.x_vel + self.y_vel * self.y_vel;
+
+        if squares &gt; MAX_SPEED * MAX_SPEED {
+            let current_speed: f32 = squares.sqrt();
+            self.x_vel *= MAX_SPEED / current_speed;
+            self.y_vel *= MAX_SPEED / current_speed;
+        }
+    }
+}
+</code></pre>
+<h2 id="direction"><a class="header" href="#direction">Direction</a></h2>
+<p>Similarly to the component above, Velocity, Direction is another important
+parameter to the movement system we are creating for the game. The angle
+is measured in radians and is used to determine the direction that a ship
+is facing. This is important for accelerating and when the player shoots
+their lasers. This component contains two implementations for turning.</p>
+<pre><code class="language-rust  noplayground">#[derive(Component)]
+struct Direction {
+    angle: f32,
+}
+impl Direction {
+    fn rotate_right(&amp;mut self) {
+        self.angle -= TURN_FACTOR * 0.01;
+        if self.angle &gt;= 2. * PI {
+            self.angle -= 2. * PI
+        }
+    }
+    fn rotate_left(&amp;mut self) {
+        self.angle += TURN_FACTOR * 0.01;
+        if self.angle &lt; 0. {
+            self.angle += 2. * PI
+        }
+    }
+}
+</code></pre>
+<h2 id="damage"><a class="header" href="#damage">Damage</a></h2>
+<p>The Damage component represents the amount of damage that an entity will
+inflict on an entity that has Health upon collision. An example of the use for
+this would be when a laser collides into an asteroid or when an asteroid collides
+into a player. A laser would have a significantly smaller damage value than an
+asteroid would.</p>
+<pre><code class="language-rust  noplayground">#[derive(Component)]
+struct Damage {
+    damage: u64,
+}
+</code></pre>
+<h2 id="projectile-timer"><a class="header" href="#projectile-timer">Projectile Timer</a></h2>
+<p>The Projectile Timer component is specifically used for lasers shot by the
+player. This component creates a timer and determines when the laser entity
+should no longer be present on the screen. This is used to prevent lasers
+from spawning and existing infinitely until contact. After a timer has elapsed,
+we will know when to de-spawn our laser entities.</p>
+<pre><code class="language-rust  noplayground">#[derive(Component)]
+struct ProjectileTimer {
+    timer: Timer,
+    elapsed: bool,
+}
+</code></pre>
+<h2 id="human"><a class="header" href="#human">Human</a></h2>
+<p>The final component we are creating for this tutorial is a Human component.
+This is used to show if a human player is controlling an object or not. The
+use for this would be to have the future controlling systems only allow for the
+player to control their ship entity.</p>
+<pre><code class="language-rust  noplayground">#[derive(Component)]
+struct Human {
+    is_human: bool,
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="bundles"><a class="header" href="#bundles">Bundles</a></h1>
+<p>In Bevy, a bundle is a trait that groups components together. The purpose of
+bundling is to make the spawning of entities have a more easily visible
+grouping. Lets start first with the player's ship!</p>
+<h2 id="player-ship-bundle"><a class="header" href="#player-ship-bundle">Player Ship Bundle</a></h2>
+<p>To create a bundle, we use <code>#[derive(Bundle)]</code> in front of our bundle, similarly
+to what we did above with the components. We then create a structure that is
+composed of the components that we would like to group together.</p>
+<p>A player's ship has health, position, velocity, direction, and human components.</p>
+<pre><code class="language-rust  noplayground">#[derive(Bundle)]
+struct PlayerShipBundle {
+    health: Health,
+    position: Position,
+    velocity: Velocity,
+    direction: Direction,
+    human: Human,
+}
+</code></pre>
+<h2 id="asteroid-bundle"><a class="header" href="#asteroid-bundle">Asteroid Bundle</a></h2>
+<p>An asteroid has a health, position, and a velocity. Unlike a ship, it does not
+have a direction or a human component, as it is floating freely without
+the ability to accelerate so it has no need for direction, and it is not
+to be controlled by the player's inputs so it has no need for the human
+component.</p>
+<pre><code class="language-rust  noplayground">#[derive(Bundle)]
+struct AsteroidBundle {
+    health: Health,
+    position: Position,
+    velocity: Velocity,
+}
+</code></pre>
+<h2 id="laser-bundle"><a class="header" href="#laser-bundle">Laser Bundle</a></h2>
+<p>The final bundle we are creating is a laser bundle. It is made up of position,
+velocity, projectile timer, and damage.</p>
+<pre><code class="language-rust  noplayground">#[derive(Bundle)]
+struct LaserBundle {
+    position: Position,
+    velocity: Velocity,
+    projectile: ProjectileTimer,
+    damage: Damage,
+}
+</code></pre>
+<p>All of these bundles are used to spawn entities. As you can see, many of the
+entities will have some of the same components. Each bundle is a little
+different than the others and has some of its own unique components. Feel free
+to read up more on how a component and entity interact together online!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="startup-systems"><a class="header" href="#startup-systems">Startup Systems</a></h1>
+<p>So far we have made the Components for our game. Up next is to create the
+systems. A system is used for many low level functions. A few examples would
+be for rendering graphics, creating new entities, or taking user input.
+These systems will be added to our <code>fn main()</code> by using
+<code>App.new().add_startup_system()</code> for systems that run on initialization and <code>App.new().add_system()</code> for systems that run in a loop.</p>
+<h2 id="our-first-system---setup-camera"><a class="header" href="#our-first-system---setup-camera">Our First System - Setup Camera</a></h2>
+<p>Our first system that we are going to create is a startup system. To create
+a system, we create a function that takes the <code>Commands</code> which allows us to
+spawn entities on the screen, or into our <code>World</code>. This system creates a camera
+to display our 2D world to the player!</p>
+<pre><code class="language-rust  noplayground">fn setup_camera(mut commands: Commands) {
+    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+}
+</code></pre>
+<p>We then will add this startup system to our main function by updating <code>fn main()</code>
+to the following:</p>
+<pre><code class="language-rust  noplayground">fn main() {
+    App::new()
+        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.2)))
+        .add_plugins(DefaultPlugins)
+        .add_startup_system(spawn_camera)
+        .run();
+}
+</code></pre>
+<p>Each new system we add will be tacked onto <code>App::new()</code>.</p>
+<h2 id="our-first-complicated-system---spawn-player"><a class="header" href="#our-first-complicated-system---spawn-player">Our First Complicated System - Spawn Player</a></h2>
+<p>Similarly to <code>setup_camera</code> above, we create a function that uses <code>Commands</code>
+to spawn our ship onto the screen.</p>
+<p>We begin by creating a player as a Player Ship Bundle. We initialize the values
+for each component for this player entity. Next we use the commands to create
+a sprite and put the player entity into our world.</p>
+<p>Note: We are using another constant here</p>
+<pre><code class="language-rust  noplayground">const SHIP_COLOR: Color = Color::rgb(1.0, 1.0, 0.0);
+
+fn spawn_player(mut commands: Commands) {
+    let player = PlayerShipBundle {
+        health: Health { hp: 10 },
+        position: Position { x: 0., y: 0. },
+        velocity: Velocity {
+            x_vel: 0.0,
+            y_vel: 0.0,
+        },
+        direction: Direction { angle: PI / 2. },
+        human: Human { is_human: true },
+    };
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                color: SHIP_COLOR,
+                ..Default::default()
+            },
+            transform: Transform {
+                scale: Vec3::new(30.0, 30.0, 10.0),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .insert(player.health)
+        .insert(player.position)
+        .insert(player.velocity)
+        .insert(player.direction)
+        .insert(player.human);
+}
+</code></pre>
+<p>This system creates the player's ship's entity and spawns them at the center of
+the window facing upwards.</p>
+<h2 id="spawn-asteroid"><a class="header" href="#spawn-asteroid">Spawn Asteroid</a></h2>
+<p>Asteroids isn't too much fun with just a player in the world. Let's create a
+system for spawning Asteroids in a random position with a random velocity! We
+are now going to use the <code>rand</code> crate that we added to our dependencies.
+Please note that the first half of this system randomizes the position and
+velocity for the asteroid.</p>
+<pre><code class="language-rust  noplayground">const WINDOW_X: f32 = 1280.;
+const WINDOW_Y: f32 = 720.;
+
+const ASTEROID_COLOR: Color = Color::rgb(0.0, 1.0, 1.0);
+
+fn spawn_asteroid(mut commands: Commands) {
+    let rand_angle: f32 = rand::random::&lt;f32&gt;() * 2. * PI;
+    let rand_vel: f32 = rand::random::&lt;f32&gt;() * MAX_SPEED;
+
+    let mut rand_pos_x: f32 = rand::random::&lt;f32&gt;() * WINDOW_X;
+    let mut rand_pos_y: f32 = rand::random::&lt;f32&gt;() * WINDOW_Y;
+
+    if rand_pos_x &gt; WINDOW_X / 2. {
+        rand_pos_x -= WINDOW_X;
+    }
+
+    if rand_pos_y &gt; WINDOW_Y / 2. {
+        rand_pos_y -= WINDOW_Y;
+    }
+
+    let rand_vel_x: f32 = rand_vel * rand_angle.cos();
+    let rand_vel_y: f32 = rand_vel * rand_angle.sin();
+
+    let asteroid = AsteroidBundle {
+        health: Health { hp: 200 },
+        position: Position {
+            x: rand_pos_x,
+            y: rand_pos_y,
+        },
+        velocity: Velocity {
+            x_vel: rand_vel_x,
+            y_vel: rand_vel_y,
+        },
+    };
+    commands
+        .spawn_bundle(SpriteBundle {
+            sprite: Sprite {
+                color: ASTEROID_COLOR,
+                ..Default::default()
+            },
+            transform: Transform {
+                scale: Vec3::new(30.0, 30.0, 10.0),
+                translation: Vec3::new(rand_pos_x, rand_pos_y, 10.0),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .insert(asteroid.health)
+        .insert(asteroid.position)
+        .insert(asteroid.velocity);
+}
+</code></pre>
+<p>That is it for our startup systems! Using these we have been able to take
+our components and create entities made up of them and represent them on the
+screen!</p>
+<p>Please continue to the next chapter to make some systems that continuously run!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="runtime-systems"><a class="header" href="#runtime-systems">Runtime Systems</a></h1>
+<p>Part of the power of using ECS is that each component will be able to be quickly
+queried. If we decided to use Object Oriented Programming (OOP), this program
+would have looked very different up to and including this point and would go
+against the principles of using Bevy as a data-driven game engine.</p>
+<p>Each runtime system we create will query against certain components to
+determine what entities are relevant to the system.</p>
+<p>Our first system we create is fundamental to the player, asteroids, and laser
+entities.</p>
+<h2 id="movement"><a class="header" href="#movement">Movement</a></h2>
+<p>We begin by determining the Query for our movement system. For movement,
+we will use Transform, Velocity, and Position. Transform is Bevy's
+component that is used to move entities along the screen. When the query is run,
+it will iterate over each entity that has a Transform, Velocity, and a Position
+and will translate the transform component to the next location and update the
+position.</p>
+<pre><code class="language-rust  noplayground">const MAX_ACCEL: f32 = 0.05;
+
+fn movement(mut query: Query&lt;(&amp;mut Transform, &amp; Velocity, &amp;mut Position)&gt;) {
+    for (mut transform, velocity, mut position) in query.iter_mut() {
+        transform.translation.x += MAX_ACCEL * velocity.x_vel;
+        transform.translation.y += MAX_ACCEL * velocity.y_vel;
+        position.x += MAX_ACCEL * velocity.x_vel;
+        position.y += MAX_ACCEL * velocity.y_vel;
+    }
+}
+</code></pre>
+<p>We then will add this to our app with <code>.add_system(movement)</code>.</p>
+<h2 id="edge-warp"><a class="header" href="#edge-warp">Edge Warp</a></h2>
+<p>The next system we will add is an edge warp. This is an important part of the
+&quot;Asteroids&quot; style gameplay. When an entity goes off of the screen it warps to
+the other side. This System adds this functionality in by moving the position
+and translating the sprite if it is crossing over the edge.</p>
+<pre><code class="language-rust  noplayground">fn edge_warp(mut query: Query&lt;(&amp;mut Transform, &amp;mut Position)&gt;) {
+    let edge_buffer: f32 = 15.;
+
+    for (mut transform, mut position) in query.iter_mut() {
+        if position.x &gt; (WINDOW_X / 2. - edge_buffer) {
+            transform.translation.x -= WINDOW_X;
+            position.x -= WINDOW_X
+        } else if position.x &lt; (-WINDOW_X / 2. + edge_buffer) {
+            transform.translation.x += WINDOW_X;
+            position.x += WINDOW_X
+        }
+
+        if position.y &gt; (WINDOW_Y / 2. - edge_buffer) {
+            transform.translation.y -= WINDOW_Y;
+            position.y -= WINDOW_Y;
+        } else if position.y &lt; (-WINDOW_Y / 2. + edge_buffer) {
+            transform.translation.y += WINDOW_Y;
+            position.y += WINDOW_Y;
+        }
+    }
+}
+</code></pre>
+<h2 id="player-input"><a class="header" href="#player-input">Player Input</a></h2>
+<p>The next system we are creating is critical for the player to play the game!
+This system takes the keyboard input and then will determine what the player's
+ship will do. The arrow keys will rotate the ship and the up arrow will accelerate.
+The down key will rotate the ship opposite of the direction it is travelling.</p>
+<pre><code class="language-rust  noplayground">fn player_input(
+    keyboard_input: Res&lt;Input&lt;KeyCode&gt;&gt;,
+    mut query: Query&lt;(
+        &amp;mut Transform,
+        &amp;mut Velocity,
+        &amp;mut Direction,
+        &amp;Position,
+        &amp;Human,
+    )&gt;,
+) {
+    for (mut transform, mut velocity, mut direction, _position, _human) in query.iter_mut() {
+        if keyboard_input.pressed(KeyCode::Left) {
+            let prev_dir = direction.angle;
+            direction.rotate_left();
+            let dir_change = direction.angle - prev_dir;
+            transform.rotate(Quat::from_rotation_z(dir_change));
+        }
+        if keyboard_input.pressed(KeyCode::Right) {
+            let prev_dir = direction.angle;
+            direction.rotate_right();
+            let dir_change = direction.angle - prev_dir;
+            transform.rotate(Quat::from_rotation_z(dir_change));
+        }
+        if keyboard_input.pressed(KeyCode::Down) {
+            let dir_velocity: f32 = (velocity.y_vel / velocity.x_vel).atan();
+            let difference: f32 = direction.angle - dir_velocity;
+            if difference &lt; PI {
+                let prev_dir = direction.angle;
+                direction.rotate_right();
+                let dir_change = direction.angle - prev_dir;
+                transform.rotate(Quat::from_rotation_z(dir_change));
+            }
+        }
+        if keyboard_input.pressed(KeyCode::Up) {
+            velocity.accelerate(direction.angle);
+        }
+    }
+}
+</code></pre>
+<h2 id="spawn-laser"><a class="header" href="#spawn-laser">Spawn Laser</a></h2>
+<p>This system spawns a laser when the player presses the space bar. This is
+a combination of what we have learned in the player input and with our earlier
+startup systems. Combining those practices, we are able to spawn a new entity
+when the player presses the space bar. We also spawn it past the player's ship
+to avoid the new lasers from damaging the player.</p>
+<pre><code class="language-rust  noplayground">const LASER_COLOR: Color = Color::rgb(1.0, 0.0, 0.0);
+
+const BULLET_SPEED: f32 = 100.;
+
+fn spawn_laser(
+    keyboard_input: Res&lt;Input&lt;KeyCode&gt;&gt;,
+    query: Query&lt;(&amp;Velocity, &amp;Direction, &amp;Position, &amp;Human)&gt;,
+    time: Res&lt;Time&gt;,
+    mut commands: Commands,
+) {
+    for (velocity, direction, position, _human) in query.iter() {
+        if keyboard_input.pressed(KeyCode::Space) {
+            let laser = LaserBundle {
+                position: Position {
+                    x: position.x + 30. * direction.angle.cos(),
+                    y: position.y + 30. * direction.angle.sin(),
+                },
+                velocity: Velocity {
+                    x_vel: BULLET_SPEED * direction.angle.cos() + velocity.x_vel,
+                    y_vel: BULLET_SPEED * direction.angle.sin() + velocity.y_vel,
+                },
+                projectile: ProjectileTimer {
+                    timer: Timer::from_seconds(0.5, true),
+                    elapsed: false,
+                },
+                damage: Damage { damage: 5 },
+            };
+            commands
+                .spawn_bundle(SpriteBundle {
+                    sprite: Sprite {
+                        color: LASER_COLOR,
+                        ..Default::default()
+                    },
+                    transform: Transform {
+                        scale: Vec3::new(5.0, 5.0, 10.0),
+                        translation: Vec3::new(laser.position.x, laser.position.y, 10.0),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                })
+                .insert(laser.position)
+                .insert(laser.velocity)
+                .insert(laser.projectile)
+                .insert(laser.damage);
+        }
+    }
+}
+</code></pre>
+<h2 id="despawn-laser"><a class="header" href="#despawn-laser">Despawn Laser</a></h2>
+<p>The despawn laser system is used to despawn a laser entity when it has reached
+its time limit that was determined upon spawning.</p>
+<pre><code class="language-rust  noplayground">fn despawn_laser(
+    mut commands: Commands,
+    time: Res&lt;Time&gt;,
+    mut query: Query&lt;(Entity, &amp;mut ProjectileTimer)&gt;,
+) {
+    for (entity, mut projectile) in query.iter_mut() {
+        if projectile.timer.tick(time.delta()).just_finished() {
+            projectile.elapsed = true;
+        }
+        if projectile.elapsed == true {
+            commands.entity(entity).despawn();
+        }
+    }
+}
+</code></pre>
+<h2 id="detect-laser-collision"><a class="header" href="#detect-laser-collision">Detect Laser Collision</a></h2>
+<p>The detect laser collision system is used to determine when a laser contacts
+another object, especially asteroids. When this happens we will remove a certain
+amount of hit points from the asteroid and then despawn the laser. If the entity
+that we hit with the laser goes below zero hit points we will also despawn that
+entity.</p>
+<pre><code class="language-rust  noplayground">fn detect_laser_collision(
+    mut commands: Commands,
+    laser_query: Query&lt;(Entity, &amp;Damage, &amp;Transform)&gt;,
+    mut query: Query&lt;(Entity, &amp;Transform, &amp;mut Health)&gt;,
+) {
+    for (entity, transform, mut health) in query.iter_mut() {
+        for (laser_entity, damage, laser_transform) in laser_query.iter() {
+            let laser_size = laser_transform.scale.truncate();
+
+            let collision = collide(
+                laser_transform.translation,
+                laser_size,
+                transform.translation,
+                transform.scale.truncate(),
+            );
+            if let Some(collision) = collision {
+                health.hp = health.hp - damage.damage;
+
+                if health.hp &lt;= 0 {
+                    commands.entity(entity).despawn();
+                }
+                commands.entity(laser_entity).despawn();
+            }
+        }
+    }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h1>
+<p>We did it! Don't forget to add each system to the <code>App.new()</code> and test out the
+game. Check out <a href="https://github.com/mattrost/meteors">my repository</a> to see the
+full code that I have made so far for this project.</p>
+<p>Here are a few things you should try to do to build upon your Rust and Bevy skills:</p>
+<ul>
+<li>Add in timed asteroid spawning that increases difficulty with more time played</li>
+<li>Find my hidden bug that causes the game to panic on some asteroid despawns.
+I think this happens when the player is touching the asteroid as it is de-spawned, or
+when the edge warp is happening during the de-spawn.</li>
+<li>Implement events, like keeping track of player score</li>
+<li>Add in sprites for the ship, laser, and asteroids to improve aesthetics.</li>
+<li>Make your own game!</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </body>
+</html>

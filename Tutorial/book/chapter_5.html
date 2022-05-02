@@ -1,0 +1,399 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Runtime Systems - Bevy Tutorial - 2D Space Combat</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Introduction</a></li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Project Initialization</a></li><li class="chapter-item expanded "><a href="chapter_2.html"><strong aria-hidden="true">2.</strong> Components</a></li><li class="chapter-item expanded "><a href="chapter_3.html"><strong aria-hidden="true">3.</strong> Bundles</a></li><li class="chapter-item expanded "><a href="chapter_4.html"><strong aria-hidden="true">4.</strong> Startup Systems</a></li><li class="chapter-item expanded "><a href="chapter_5.html" class="active"><strong aria-hidden="true">5.</strong> Runtime Systems</a></li><li class="chapter-item expanded "><a href="chapter_6.html"><strong aria-hidden="true">6.</strong> Next Steps</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Bevy Tutorial - 2D Space Combat</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="runtime-systems"><a class="header" href="#runtime-systems">Runtime Systems</a></h1>
+<p>Part of the power of using ECS is that each component will be able to be quickly
+queried. If we decided to use Object Oriented Programming (OOP), this program
+would have looked very different up to and including this point and would go
+against the principles of using Bevy as a data-driven game engine.</p>
+<p>Each runtime system we create will query against certain components to
+determine what entities are relevant to the system.</p>
+<p>Our first system we create is fundamental to the player, asteroids, and laser
+entities.</p>
+<h2 id="movement"><a class="header" href="#movement">Movement</a></h2>
+<p>We begin by determining the Query for our movement system. For movement,
+we will use Transform, Velocity, and Position. Transform is Bevy's
+component that is used to move entities along the screen. When the query is run,
+it will iterate over each entity that has a Transform, Velocity, and a Position
+and will translate the transform component to the next location and update the
+position.</p>
+<pre><code class="language-rust  noplayground">const MAX_ACCEL: f32 = 0.05;
+
+fn movement(mut query: Query&lt;(&amp;mut Transform, &amp; Velocity, &amp;mut Position)&gt;) {
+    for (mut transform, velocity, mut position) in query.iter_mut() {
+        transform.translation.x += MAX_ACCEL * velocity.x_vel;
+        transform.translation.y += MAX_ACCEL * velocity.y_vel;
+        position.x += MAX_ACCEL * velocity.x_vel;
+        position.y += MAX_ACCEL * velocity.y_vel;
+    }
+}
+</code></pre>
+<p>We then will add this to our app with <code>.add_system(movement)</code>.</p>
+<h2 id="edge-warp"><a class="header" href="#edge-warp">Edge Warp</a></h2>
+<p>The next system we will add is an edge warp. This is an important part of the
+&quot;Asteroids&quot; style gameplay. When an entity goes off of the screen it warps to
+the other side. This System adds this functionality in by moving the position
+and translating the sprite if it is crossing over the edge.</p>
+<pre><code class="language-rust  noplayground">fn edge_warp(mut query: Query&lt;(&amp;mut Transform, &amp;mut Position)&gt;) {
+    let edge_buffer: f32 = 15.;
+
+    for (mut transform, mut position) in query.iter_mut() {
+        if position.x &gt; (WINDOW_X / 2. - edge_buffer) {
+            transform.translation.x -= WINDOW_X;
+            position.x -= WINDOW_X
+        } else if position.x &lt; (-WINDOW_X / 2. + edge_buffer) {
+            transform.translation.x += WINDOW_X;
+            position.x += WINDOW_X
+        }
+
+        if position.y &gt; (WINDOW_Y / 2. - edge_buffer) {
+            transform.translation.y -= WINDOW_Y;
+            position.y -= WINDOW_Y;
+        } else if position.y &lt; (-WINDOW_Y / 2. + edge_buffer) {
+            transform.translation.y += WINDOW_Y;
+            position.y += WINDOW_Y;
+        }
+    }
+}
+</code></pre>
+<h2 id="player-input"><a class="header" href="#player-input">Player Input</a></h2>
+<p>The next system we are creating is critical for the player to play the game!
+This system takes the keyboard input and then will determine what the player's
+ship will do. The arrow keys will rotate the ship and the up arrow will accelerate.
+The down key will rotate the ship opposite of the direction it is travelling.</p>
+<pre><code class="language-rust  noplayground">fn player_input(
+    keyboard_input: Res&lt;Input&lt;KeyCode&gt;&gt;,
+    mut query: Query&lt;(
+        &amp;mut Transform,
+        &amp;mut Velocity,
+        &amp;mut Direction,
+        &amp;Position,
+        &amp;Human,
+    )&gt;,
+) {
+    for (mut transform, mut velocity, mut direction, _position, _human) in query.iter_mut() {
+        if keyboard_input.pressed(KeyCode::Left) {
+            let prev_dir = direction.angle;
+            direction.rotate_left();
+            let dir_change = direction.angle - prev_dir;
+            transform.rotate(Quat::from_rotation_z(dir_change));
+        }
+        if keyboard_input.pressed(KeyCode::Right) {
+            let prev_dir = direction.angle;
+            direction.rotate_right();
+            let dir_change = direction.angle - prev_dir;
+            transform.rotate(Quat::from_rotation_z(dir_change));
+        }
+        if keyboard_input.pressed(KeyCode::Down) {
+            let dir_velocity: f32 = (velocity.y_vel / velocity.x_vel).atan();
+            let difference: f32 = direction.angle - dir_velocity;
+            if difference &lt; PI {
+                let prev_dir = direction.angle;
+                direction.rotate_right();
+                let dir_change = direction.angle - prev_dir;
+                transform.rotate(Quat::from_rotation_z(dir_change));
+            }
+        }
+        if keyboard_input.pressed(KeyCode::Up) {
+            velocity.accelerate(direction.angle);
+        }
+    }
+}
+</code></pre>
+<h2 id="spawn-laser"><a class="header" href="#spawn-laser">Spawn Laser</a></h2>
+<p>This system spawns a laser when the player presses the space bar. This is
+a combination of what we have learned in the player input and with our earlier
+startup systems. Combining those practices, we are able to spawn a new entity
+when the player presses the space bar. We also spawn it past the player's ship
+to avoid the new lasers from damaging the player.</p>
+<pre><code class="language-rust  noplayground">const LASER_COLOR: Color = Color::rgb(1.0, 0.0, 0.0);
+
+const BULLET_SPEED: f32 = 100.;
+
+fn spawn_laser(
+    keyboard_input: Res&lt;Input&lt;KeyCode&gt;&gt;,
+    query: Query&lt;(&amp;Velocity, &amp;Direction, &amp;Position, &amp;Human)&gt;,
+    time: Res&lt;Time&gt;,
+    mut commands: Commands,
+) {
+    for (velocity, direction, position, _human) in query.iter() {
+        if keyboard_input.pressed(KeyCode::Space) {
+            let laser = LaserBundle {
+                position: Position {
+                    x: position.x + 30. * direction.angle.cos(),
+                    y: position.y + 30. * direction.angle.sin(),
+                },
+                velocity: Velocity {
+                    x_vel: BULLET_SPEED * direction.angle.cos() + velocity.x_vel,
+                    y_vel: BULLET_SPEED * direction.angle.sin() + velocity.y_vel,
+                },
+                projectile: ProjectileTimer {
+                    timer: Timer::from_seconds(0.5, true),
+                    elapsed: false,
+                },
+                damage: Damage { damage: 5 },
+            };
+            commands
+                .spawn_bundle(SpriteBundle {
+                    sprite: Sprite {
+                        color: LASER_COLOR,
+                        ..Default::default()
+                    },
+                    transform: Transform {
+                        scale: Vec3::new(5.0, 5.0, 10.0),
+                        translation: Vec3::new(laser.position.x, laser.position.y, 10.0),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                })
+                .insert(laser.position)
+                .insert(laser.velocity)
+                .insert(laser.projectile)
+                .insert(laser.damage);
+        }
+    }
+}
+</code></pre>
+<h2 id="despawn-laser"><a class="header" href="#despawn-laser">Despawn Laser</a></h2>
+<p>The despawn laser system is used to despawn a laser entity when it has reached
+its time limit that was determined upon spawning.</p>
+<pre><code class="language-rust  noplayground">fn despawn_laser(
+    mut commands: Commands,
+    time: Res&lt;Time&gt;,
+    mut query: Query&lt;(Entity, &amp;mut ProjectileTimer)&gt;,
+) {
+    for (entity, mut projectile) in query.iter_mut() {
+        if projectile.timer.tick(time.delta()).just_finished() {
+            projectile.elapsed = true;
+        }
+        if projectile.elapsed == true {
+            commands.entity(entity).despawn();
+        }
+    }
+}
+</code></pre>
+<h2 id="detect-laser-collision"><a class="header" href="#detect-laser-collision">Detect Laser Collision</a></h2>
+<p>The detect laser collision system is used to determine when a laser contacts
+another object, especially asteroids. When this happens we will remove a certain
+amount of hit points from the asteroid and then despawn the laser. If the entity
+that we hit with the laser goes below zero hit points we will also despawn that
+entity.</p>
+<pre><code class="language-rust  noplayground">fn detect_laser_collision(
+    mut commands: Commands,
+    laser_query: Query&lt;(Entity, &amp;Damage, &amp;Transform)&gt;,
+    mut query: Query&lt;(Entity, &amp;Transform, &amp;mut Health)&gt;,
+) {
+    for (entity, transform, mut health) in query.iter_mut() {
+        for (laser_entity, damage, laser_transform) in laser_query.iter() {
+            let laser_size = laser_transform.scale.truncate();
+
+            let collision = collide(
+                laser_transform.translation,
+                laser_size,
+                transform.translation,
+                transform.scale.truncate(),
+            );
+            if let Some(collision) = collision {
+                health.hp = health.hp - damage.damage;
+
+                if health.hp &lt;= 0 {
+                    commands.entity(entity).despawn();
+                }
+                commands.entity(laser_entity).despawn();
+            }
+        }
+    }
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="chapter_4.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next" href="chapter_6.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="chapter_4.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next" href="chapter_6.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </body>
+</html>
